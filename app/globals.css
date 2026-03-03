@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* 테마 전환 시 배경/텍스트 색상이 부드럽게 바뀌도록 */
+  html {
+    @apply transition-colors duration-200;
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+    @apply dark:bg-zinc-950 dark:text-zinc-100;
+  }
+
+  /* 스크롤바 스타일 (Webkit 계열 브라우저) */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-slate-300 dark:bg-zinc-700;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-400 dark:bg-zinc-600;
+  }
+
+  /* 텍스트 선택 색상 */
+  ::selection {
+    @apply bg-indigo-200 text-indigo-900 dark:bg-indigo-500/30 dark:text-indigo-100;
+  }
+}
+
+@layer utilities {
+  /* 카드 공통 스타일 유틸리티 */
+  .card {
+    @apply rounded-xl border border-slate-200 bg-white dark:border-zinc-800 dark:bg-zinc-900;
+  }
+
+  /* 입력 필드 공통 스타일 */
+  .input {
+    @apply w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm;
+    @apply placeholder:text-slate-400 outline-none;
+    @apply focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20;
+    @apply dark:border-zinc-700 dark:bg-zinc-900 dark:placeholder:text-zinc-500;
+    @apply dark:focus:border-indigo-400 dark:focus:ring-indigo-400/20;
+    @apply transition-colors duration-150;
+  }
+
+  /* 주요 버튼 */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium;
+    @apply bg-indigo-600 text-white hover:bg-indigo-500 active:bg-indigo-700;
+    @apply dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:active:bg-indigo-600;
+    @apply transition-colors duration-150 disabled:opacity-50;
+  }
+
+  /* 보조 버튼 */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium;
+    @apply text-slate-600 hover:bg-slate-100 active:bg-slate-200;
+    @apply dark:text-zinc-400 dark:hover:bg-zinc-800 dark:active:bg-zinc-700;
+    @apply transition-colors duration-150;
+  }
+}
