@@ -15,7 +15,7 @@ import Header from "@/components/layout/Header";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Board | Frontend Goes Backend",
+  title: "Board",
   description: "프론트 개발자의 풀스택 도전 - 게시판 프로젝트",
 };
 
