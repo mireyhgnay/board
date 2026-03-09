@@ -106,12 +106,6 @@ export default function Header() {
           <Link href="/posts" className="btn-ghost text-sm px-3 py-2">
             게시글
           </Link>
-          <Link href="/login" className="btn-ghost text-sm px-3 py-2">
-            로그인
-          </Link>
-          <Link href="/signup" className="btn-primary text-sm px-3 py-2 ml-1">
-            회원가입
-          </Link>
 
           {/* 다크/라이트 모드 토글 */}
           <button
@@ -155,20 +149,6 @@ export default function Header() {
               className="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-zinc-300 dark:hover:bg-zinc-800 transition-colors"
             >
               게시글
-            </Link>
-            <Link
-              href="/login"
-              onClick={closeMenu}
-              className="flex items-center rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-zinc-300 dark:hover:bg-zinc-800 transition-colors"
-            >
-              로그인
-            </Link>
-            <Link
-              href="/signup"
-              onClick={closeMenu}
-              className="mt-1 flex items-center justify-center rounded-lg px-3 py-2.5 text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400 transition-colors"
-            >
-              회원가입
             </Link>
           </nav>
         </div>
