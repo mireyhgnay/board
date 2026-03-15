@@ -1,27 +1,30 @@
 // app/posts/new/page.tsx
 // -----------------------
 // 게시글 작성 페이지 (/posts/new)
-// 폼 입력 상태가 필요하므로 Client Component
+// useCreatePost 훅으로 POST /posts 호출
 
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useCreatePost } from "@/hooks/usePosts";
 
 export default function NewPostPage() {
   const router = useRouter();
+  const { mutate, isPending, error } = useCreatePost();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setIsLoading(true);
-    // TODO: lib/api/posts.ts의 createPost() 연결 예정
-    await new Promise((r) => setTimeout(r, 800));
-    setIsLoading(false);
-    router.push("/posts");
+    mutate(
+      { title, content },
+      {
+        // 성공 시 목록 페이지로 이동
+        onSuccess: () => router.push("/posts"),
+      }
+    );
   }
 
   return (
@@ -41,6 +44,13 @@ export default function NewPostPage() {
         <h1 className="mb-6 text-xl font-bold text-slate-900 dark:text-zinc-50">
           새 글 쓰기
         </h1>
+
+        {/* 에러 메시지 */}
+        {error && (
+          <div className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
+            {error.message}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           {/* 제목 */}
@@ -79,10 +89,10 @@ export default function NewPostPage() {
             </Link>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isPending}
               className="btn-primary"
             >
-              {isLoading ? "저장 중..." : "게시글 등록"}
+              {isPending ? "저장 중..." : "게시글 등록"}
             </button>
           </div>
         </form>

@@ -3,14 +3,34 @@
 // 게시글 관련 TypeScript 타입 정의
 // 백엔드(FastAPI) API 응답 형태와 일치시켜 관리
 
+// ─── 백엔드 공통 응답 래퍼 ──────────────────────────────────────────────────
+// FastAPI 백엔드는 모든 응답을 { success, message, data } 형태로 감싸서 반환
+
+/** 단건 응답 래퍼 (예: 게시글 상세, 생성, 수정) */
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+}
+
+/** 페이지네이션 응답 래퍼 (예: 게시글 목록) */
+export interface PaginatedResponse<T> {
+  success: boolean;
+  message: string;
+  data: T[];
+  total: number;
+  page: number;
+  size: number;
+  total_pages: number;
+}
+
 // ─── 응답 타입 (서버 → 클라이언트) ─────────────────────────────────────────
 
-/** 게시글 단건 (백엔드 응답 형태) */
+/** 게시글 단건 (백엔드 PostResponse 스키마와 일치) */
 export interface Post {
   id: number;
   title: string;
   content: string;
-  author_id: string;    // Python snake_case 필드명 그대로 사용
   created_at: string;   // ISO 8601 날짜 문자열 예: "2024-01-01T00:00:00Z"
   updated_at: string;
 }

@@ -15,5 +15,11 @@ export function formatDate(isoString: string): string {
  * 예: "2024-01-15T09:30:00Z" → "2024. 1. 15. 오전 9:30"
  */
 export function formatDateTime(isoString: string): string {
-  return new Date(isoString).toLocaleString("ko-KR");
+  return new Date(isoString).toLocaleString("ko-KR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }

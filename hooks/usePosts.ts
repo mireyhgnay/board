@@ -1,77 +1,78 @@
 // hooks/usePosts.ts
 // ------------------
-// 게시글 상태를 관리하는 커스텀 훅
-// 목록 조회, 작성, 수정, 삭제 로직과 로딩/에러 상태를 제공
+// 게시글 관련 React Query 훅 모음
+// - usePosts: 게시글 목록 조회 (GET /posts)
+// - usePost: 게시글 상세 조회 (GET /posts/:id)
+// - useCreatePost: 게시글 작성 (POST /posts)
+// - useUpdatePost: 게시글 수정 (PUT /posts/:id)
+// - useDeletePost: 게시글 삭제 (DELETE /posts/:id)
 
 "use client";
 
-import { useState } from "react";
-import { getPosts, createPost, updatePost, deletePost } from "@/lib/api/posts";
-import type { CreatePostRequest, Post, UpdatePostRequest } from "@/types/post";
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getPosts, getPost, createPost, updatePost, deletePost } from "@/lib/api/posts";
+import type { CreatePostRequest, UpdatePostRequest } from "@/types/post";
 
+// 쿼리 키 상수 — 캐시 무효화 시 일관된 키 사용
+export const postKeys = {
+  all: ["posts"] as const,
+  detail: (id: number) => ["posts", id] as const,
+};
+
+/** 게시글 목록 무한스크롤 훅 — 20개씩 페이지 단위로 로드 */
 export function usePosts() {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  return useInfiniteQuery({
+    queryKey: postKeys.all,
+    queryFn: ({ pageParam }) => getPosts(pageParam),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.page < lastPage.total_pages ? lastPage.page + 1 : undefined,
+  });
+}
 
-  /** 게시글 목록 불러오기 */
-  async function fetchPosts() {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const data = await getPosts();
-      setPosts(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "목록 조회 실패");
-    } finally {
-      setIsLoading(false);
-    }
-  }
+/** 게시글 상세 조회 훅 (GET /posts/:id) */
+export function usePost(id: number) {
+  return useQuery({
+    queryKey: postKeys.detail(id),
+    queryFn: () => getPost(id),
+  });
+}
 
-  /** 게시글 작성 */
-  async function addPost(body: CreatePostRequest) {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const newPost = await createPost(body);
-      // 목록 맨 앞에 새 게시글 추가 (재조회 없이 낙관적 업데이트)
-      setPosts((prev) => [newPost, ...prev]);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "게시글 작성 실패");
-    } finally {
-      setIsLoading(false);
-    }
-  }
+/** 게시글 작성 훅 — 성공 시 목록 캐시 무효화 */
+export function useCreatePost() {
+  const queryClient = useQueryClient();
 
-  /** 게시글 수정 */
-  async function editPost(id: number, body: UpdatePostRequest) {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const updated = await updatePost(id, body);
-      // 수정된 게시글만 교체
-      setPosts((prev) => prev.map((p) => (p.id === id ? updated : p)));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "게시글 수정 실패");
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  return useMutation({
+    mutationFn: (body: CreatePostRequest) => createPost(body),
+    onSuccess: () => {
+      // 작성 성공 → 목록 다시 불러오기
+      queryClient.invalidateQueries({ queryKey: postKeys.all });
+    },
+  });
+}
 
-  /** 게시글 삭제 */
-  async function removePost(id: number) {
-    setIsLoading(true);
-    setError(null);
-    try {
-      await deletePost(id);
-      // 삭제된 게시글 제거
-      setPosts((prev) => prev.filter((p) => p.id !== id));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "게시글 삭제 실패");
-    } finally {
-      setIsLoading(false);
-    }
-  }
+/** 게시글 수정 훅 — 성공 시 목록 + 상세 캐시 무효화 */
+export function useUpdatePost() {
+  const queryClient = useQueryClient();
 
-  return { posts, isLoading, error, fetchPosts, addPost, editPost, removePost };
+  return useMutation({
+    mutationFn: ({ id, body }: { id: number; body: UpdatePostRequest }) =>
+      updatePost(id, body),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: postKeys.all });
+      queryClient.invalidateQueries({ queryKey: postKeys.detail(variables.id) });
+    },
+  });
+}
+
+/** 게시글 삭제 훅 — 성공 시 목록 캐시 무효화 */
+export function useDeletePost() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => deletePost(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: postKeys.all });
+    },
+  });
 }

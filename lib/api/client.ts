@@ -6,7 +6,9 @@
 
 // 백엔드 FastAPI 서버 주소 (환경변수에서 로드)
 // NEXT_PUBLIC_ 접두사가 있어야 브라우저에서 접근 가능
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+// 백엔드 API 경로가 /api/v1 접두사를 사용하므로 BASE_URL에 포함
+const BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
 
 /**
  * 백엔드 API를 호출하는 공통 함수

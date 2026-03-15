@@ -11,6 +11,7 @@
 
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
+import QueryProvider from "@/lib/query/QueryProvider";
 import Header from "@/components/layout/Header";
 import "./globals.css";
 
@@ -51,12 +52,14 @@ export default function RootLayout({
       </head>
       <body>
         {/* ThemeProvider로 감싸서 하위 컴포넌트가 useTheme() 사용 가능 */}
-        <ThemeProvider>
-          <Header />
-          <main className="mx-auto max-w-4xl px-4 py-8 animate-fade-up">
-            {children}
-          </main>
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider>
+            <Header />
+            <main className="mx-auto max-w-4xl px-4 py-8 animate-fade-up">
+              {children}
+            </main>
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );
